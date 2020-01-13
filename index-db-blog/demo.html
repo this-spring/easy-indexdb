@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>IndexDb</title>
+    <style class="btn">
+      .btn {
+        width: 80px;
+        height: 30px;
+      }
+    </style>
+</head>
+<body>
+    <h1>IndexDB demo</h1>
+    <button onclick="DbSelect()" class="btn">查询</button>
+    <button onclick="DbDelete()" class="btn">删除</button>
+    <button onclick="DbUpdate()" class="btn">修改</button>
+    <button onclick="DbAdd()" class="btn">增加</button>
+</body>
+</html>
+
+<script type="text/javascript">
+  const dbName = 'test_db';
+  var request = indexedDB.open(dbName, 2);
+  var db = null;
+  request.onerror = (e) => {
+    console.error(' indexDB error: ', e);
+  };
+  request.onsuccess = (e) => {
+    // init(e);
+    db = e.target.result;
+  }
+  // test data
+  const customerData = [
+    { ssn: "444-44-4444", name: "Bill", age: 35, email: "bill@company.com" },
+    { ssn: "555-55-5555", name: "Donna", age: 32, email: "donna@home.org" }
+  ];
+  request.onupgradeneeded = (e) => {
+    init(e);
+  };
+
+  function DbSelect() {
+    var transaction = db.transaction(['customers']);
+    var objectStore = transaction.objectStore('customers');
+    var request = objectStore.get('444-44-4444');
+    request.onerror = (event) => {
+      console.error(event);
+    }
+    request.onsuccess = (event) => {
+      console.error(' DbSelect:', event.target.result);
+    }
+  }
+
+  function DbDelete() {
+    var request = db.transaction(['customers'], 'readwrite').objectStore('customers').delete('444-44-4444');
+    request.onsuccess = (e) => {
+      console.log();
+    }
+  }
+
+  function DbUpdate() {
+    var objectStore = db.transaction(['customers'], 'readwrite').objectStore('customers');
+    var request = objectStore.get('444-44-4444');
+    request.onerror = function(event) {
+      console.error('onerror');
+    };
+    request.onsuccess = function(event) {
+      var data = event.target.result;
+      data.age = 1000;
+      // update table
+      var requestUpdate = objectStore.put(data);
+      requestUpdate.onerror = function(event) {
+        console.error(event);
+      };
+      requestUpdate.onsuccess = function(event) {
+        console.log('update success:', event.target.result);
+      };
+    }
+  }
+
+  function DbAdd() {
+
+  }
+
+  function init(e) {
+    db = e.target.result;
+    // create table in db, key is ssn
+    var objectStore = db.createObjectStore('customers', { keyPath: 'ssn' });
+    // use autoIncrement key
+    // var objStore = db.createObjectStore('customers', { autoIncrement: true });
+    // create field in table
+    objectStore.createIndex('name', 'name', { unique: false });
+    objectStore.createIndex('email', 'email', { unique: false });
+    // save data after table has created
+    objectStore.transaction.oncomplete = function(event) {
+      console.log('create table & init data success');
+      // save obj to table
+      // mode: readonly & readwrite & versionchange
+      var customerObjectStore = db.transaction('customers', 'readwrite').objectStore('customers');
+      customerData.forEach((value, key) => {
+        customerObjectStore.add(value);
+      });
+    };
+  }
+</script>
