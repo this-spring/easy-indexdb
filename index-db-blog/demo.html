@@ -18,6 +18,9 @@
     <button onclick="DbDelete()" class="btn">删除</button>
     <button onclick="DbUpdate()" class="btn">修改</button>
     <button onclick="DbAdd()" class="btn">增加</button>
+    <button onclick="Dbcursor()" class="btn">使用游标</button >
+    <button onclick="DbUseIndex()" class="btn">使用索引</button >
+    <button onclick="DbUseRange()" class="btn">使用游标范围</button >
 </body>
 </html>
 
@@ -103,5 +106,76 @@
         customerObjectStore.add(value);
       });
     };
+  }
+
+  function Dbcursor() {
+    var objectStore = db.transaction['customers'].objectStore('customers');
+    objectStore.openCursor().onsuccess = (event) => {
+      var cursor = event.target.result;
+      if (cursor) {
+        console.log(`name fo ssn:${cursor.key}, name:${cursor.value.name}`);
+        cursor.continue();
+      } else {
+        console.log('no more data');
+      }
+    }
+  }
+
+  function DbUseIndex() {
+    var objectStore = db.transaction['customers'].objectStore('customers');
+    var index = objectStore.index('name');
+    console.log('DbUserIndex: ', index);
+    index.get('Donna').onsuccess = function(event) {
+      console.log('DbUseIndex get(Donna):', event.target.result);
+    }
+  }
+
+  function DbIndexCursor() {
+    var objectStore = db.transaction['customers'].objectStore('customers');
+    var index = objectStore.index('name');
+    index.openCursor().onsuccess = function(event) {
+      // item value, ssn, emil....
+      if (cursor) {
+        console.log('Name: ', cursor.key, ` ssn:${cursor.value.ssn}, email:${cursor.value.email}`);
+        cursor.continue();
+      }
+    };
+    index.openKeyCursor().onsuccess = function(event) {
+      // {key, value} = {name, value}
+      var cursor = event.target.result;
+      if (cursor) {
+        console.log(`name:${cursor.key}, ssn:${cursor.value}`);
+        cursor.continue();
+      }
+    }
+  }
+  function DbUseRange() {
+    var objectStore = db.transaction['customers'].objectStore('customers');
+    var index = objectStore.index('name');
+    // 仅匹配 "Donna"
+    var singleKeyRange = IDBKeyRange.only("Donna");
+
+    // 匹配所有超过“Bill”的，包括“Bill”
+    var lowerBoundKeyRange = IDBKeyRange.lowerBound("Bill");
+
+    // 匹配所有超过“Bill”的，但不包括“Bill”
+    var lowerBoundOpenKeyRange = IDBKeyRange.lowerBound("Bill", true);
+
+    // 匹配所有不超过“Donna”的，但不包括“Donna”
+    var upperBoundOpenKeyRange = IDBKeyRange.upperBound("Donna", true);
+
+    // 匹配所有在“Bill”和“Donna”之间的，但不包括“Donna”
+    var boundKeyRange = IDBKeyRange.bound("Bill", "Donna", false, true);
+
+    // 使用其中的一个键范围，把它作为 openCursor()/openKeyCursor 的第一个参数
+    index.openCursor(boundKeyRange).onsuccess = function(event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        // 当匹配时进行一些操作
+        cursor.continue();
+      }
+    };
+    // 有时候你可能想以倒序而不是正序可以通过:objectStore.openCursor(boundKeyRange, "prev")访问
+    // 如果你只想改变遍历方向，不进行筛选，你只需要给第一个参数传入null
   }
 </script>

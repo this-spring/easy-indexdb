@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+<body>
+  <h3>book shop demo, add book, select book</h3>
+  <table>
+    <tr>
+      <td>
+        文章标题:
+      </td>
+      <td>
+        <input id="title" type="text" placeholder="请输入文章标题"/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        文章内容:
+      </td>
+      <td>
+        <input id="content" type="text" placeholder="请输入文章内容"/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        文章时间:
+      </td>
+      <td>
+        <input id="time" type="text" placeholder="请输入文章时间"/>
+      </td>
+    </tr>
+  </table>
+  <button id="add" class="btn">添加</button>
+  <button id="selectall" class="btn">查询所有</button>
+</body>
+</html>
+
+<script type="text/javascript">
+  var title = document.getElementById('title');
+  var content = document.getElementById('content');
+  var time = document.getElementById('time');
+
+  var db;
+  var DBNAME = 'this-spring';
+  var DBVERSION = 1; // int
+  var DBSTORENAME = 'bookstable';
+  document.getElementById('add').onclick = function() {
+    var t = title.value;
+    var c = content.value;
+    var m = time.value;
+    var objectStoreReq = db.transaction(DBSTORENAME, 'readwrite').objectStore(DBSTORENAME);
+    objectStoreReq.add({
+      // id: '1000',
+      title: t,
+      content: c,
+      time: m,
+    });
+    objectStoreReq.onsuccess = function(event) {
+      logger(' add success:', event.target.result);
+    };
+    objectStoreReq.onerror = function(event) {
+      logger(' add error:', event.target.result);
+    };
+    objectStoreReq.oncomplete = function(event) {
+      logger(' add complete', event.target.result);
+    }
+  };
+  document.getElementById('selectall').onclick = function() {
+    var objectStore = db.transaction(DBSTORENAME).objectStore(DBSTORENAME);
+    objectStore.openCursor().onsuccess = (event) => {
+      var cursor = event.target.result;
+      if (cursor) {
+        logger(cursor);
+        cursor.continue();
+      } else {
+        logger('no more data');
+      }
+    }
+  };
+  var template = {
+    title: 'this-spring-title',
+    content: 'this-spring-content',
+    time: 'this-spring-time',
+  }
+  function logger(...msg) {
+    console.log(...msg);
+  }
+  (function() {
+    function openDb() {
+      logger('openDb...');
+      var req = indexedDB.open(DBNAME, DBVERSION);
+      req.onsuccess = function(event) {
+        db = this.result;
+        logger('openDb Done');
+      };
+      req.onerror = function(event) {
+        logger('openDb:', event.target.errorCode);
+      }
+      req.onupgradeneeded = function(event) {
+        logger('openDb.onupgradeneeded');
+        var store = event.currentTarget.result.createObjectStore(
+          DBSTORENAME, { keyPath: 'id', autoIncrement: true }
+        );
+        store.createIndex('title', 'title', { unique: false });
+        store.createIndex('content', 'content', { unique: false });
+        store.createIndex('time', 'time', { unique: false });
+      };
+    }
+
+    openDb();
+
+  })();
+</script>
