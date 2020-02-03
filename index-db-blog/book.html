@@ -47,14 +47,17 @@
   var time = document.getElementById('time');
 
   var db;
-  var DBNAME = 'this-spring';
+  var DBNAME = 'this-spring1';
   var DBVERSION = 1; // int
-  var DBSTORENAME = 'bookstable';
+  var DBSTORENAME = 'bookstable1';
   document.getElementById('add').onclick = function() {
     var t = title.value;
     var c = content.value;
     var m = time.value;
-    var objectStoreReq = db.transaction(DBSTORENAME, 'readwrite').objectStore(DBSTORENAME);
+    var transaction = db.transaction(["books"], 'readwrite');
+    // var transaction = db.transaction(["books"], 'readwrite');
+
+    var objectStoreReq = db.transaction([DBSTORENAME], 'readwrite').objectStore(DBSTORENAME);
     objectStoreReq.add({
       // id: '1000',
       title: t,
@@ -71,7 +74,7 @@
       logger(' add complete', event.target.result);
     }
   };
-  document.getElementById('selectall').onclick = function() {
+  function selectall() {
     var objectStore = db.transaction(DBSTORENAME).objectStore(DBSTORENAME);
     objectStore.openCursor().onsuccess = (event) => {
       var cursor = event.target.result;
@@ -82,7 +85,11 @@
         logger('no more data');
       }
     }
-  };
+  }
+  setTimeout(() => {
+    selectall();
+  }, 5 * 1000);
+  document.getElementById('selectall').onclick = selectall;
   var template = {
     title: 'this-spring-title',
     content: 'this-spring-content',
@@ -97,7 +104,10 @@
       var req = indexedDB.open(DBNAME, DBVERSION);
       req.onsuccess = function(event) {
         db = this.result;
-        logger('openDb Done');
+        console.log(db);
+        var objectStore = db.transaction(DBSTORENAME).objectStore(DBSTORENAME);
+        console.log(objectStore);
+        logger('openDb Done'); 
       };
       req.onerror = function(event) {
         logger('openDb:', event.target.errorCode);
