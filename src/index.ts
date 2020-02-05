@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-01-14 23:32:29
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-03 16:04:35
+ * @LastEditTime : 2020-02-05 14:50:05
  */
 // var Parser = require('sqlparser');
 // import Parser from 'sqlparser';
@@ -15,6 +15,10 @@ class EasyIndexDb {
     
   } 
 
+  public initDB(sql: any) {
+    
+  }
+
   public execute(sql: any) {
     
   }
@@ -22,7 +26,7 @@ class EasyIndexDb {
 
 // test
 const eid = new EasyIndexDb();
-eid.execute(`
+eid.initDB(`
   use DBName_1;
 
   create table TName_1
