@@ -3,13 +3,13 @@
  * @Company: kaochong
  * @Date: 2020-02-05 23:06:03
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-05 23:16:52
+ * @LastEditTime : 2020-02-09 12:36:09
  */
-export enum CommanType {
-  DB,
-  Table,
-  Select,
-  Update,
-  Insert,
-  Delete
+export type CommandType = {
+  DB: 'DB',
+  Table: 'Table',
+  Select: 'Select',
+  Update: 'Update',
+  Insert: 'Insert',
+  Delete: 'Delete',
 };

@@ -3,39 +3,50 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:12:45
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-05 23:40:07
+ * @LastEditTime : 2020-02-09 18:36:07
  */
 import { CommandType } from './base';
+
+type SqlStruct = {
+  cmd: CommandType,
+  other: any,
+}
+
 class SQLLexter {
-  constructor() {
+  private sqlQue: Array<SqlStruct> = [];
+  private tokenQue: Array<any> = [];
 
-  }
-
-  public parserDB(sql: string) {
+  public parserSQL(sql: string) {
     const afterTrimSql = sql.toString().trim().toLowerCase();
     const afterQuoSpace = this.handleSingleQuoSpace(afterTrimSql);
     for (let i = 0, len = afterQuoSpace.length; i < len; i += 1) {
       const template = afterQuoSpace[i];
-      const index = 0;
-      const tempateLen = 0;
-      for (;index < tempateLen; i += 1) {
-        const cur = template.charAt(i);
-        let res = '';
-        // use db
+      let index = 0;
+      const tempateLen = template.length;
+      if (!template) continue;
+      for (;index < tempateLen; index += 1) {
+        const cur = template.charAt(index);
         if (/^[a-z_]+$/i.test(cur)) {
-          let sub = '', res = template.charAt(i);
-          while(i < template.length) {
-            i ++;
-            sub = template.charAt(i);
+          let sub = '', res = template.charAt(index);
+          while(index < template.length) {
+            index ++;
+            sub = template.charAt(index);
             if (!(/^[\w\.:]+$/i.test(sub))) {
-              i --;
+              index --;
               break;
             }
             res += sub
           }
+          console.log(res);
+          this.tokenQue.push(res);
         }
       }
+      this.handleAllEnd();
     }
+  }
+
+  public getLexterResult() {
+    return this.sqlQue;
   }
 
   private tokenStart(type: any) {
@@ -44,6 +55,16 @@ class SQLLexter {
 
   private tokenEnd(res: any) {
 
+  }
+
+  private handleAllEnd() {
+    const cmd = this.tokenQue.shift();
+    const sqlStru: SqlStruct = {
+      cmd: cmd,
+      other: this.tokenQue,
+    };
+    this.tokenQue = [];
+    this.sqlQue.push(sqlStru);
   }
 
   private handleSingleQuoSpace(str: string) {

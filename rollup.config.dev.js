@@ -1,3 +1,10 @@
+/*
+ * @Author: xiuquanxu
+ * @Company: kaochong
+ * @Date: 2020-01-14 23:28:31
+ * @LastEditors: xiuquanxu
+ * @LastEditTime: 2020-02-09 12:50:14
+ */
 import { uglify } from 'rollup-plugin-uglify';
 import typescript from 'rollup-plugin-typescript2';
 import serve from 'rollup-plugin-serve';
@@ -13,7 +20,7 @@ export default {
     output: {
         file: `dist/EasyIndexDB.min.js`,
         format: 'umd',
-        name: 'BetterWorker',
+        name: 'EasyIndexDB',
         sourceMap: true,
     },
     plugins: [
