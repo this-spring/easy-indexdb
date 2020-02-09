@@ -3,14 +3,9 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:12:45
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-09 18:36:07
+ * @LastEditTime : 2020-02-09 19:28:54
  */
-import { CommandType } from './base';
-
-type SqlStruct = {
-  cmd: CommandType,
-  other: any,
-}
+import { CommandType, SqlStruct } from './base';
 
 class SQLLexter {
   private sqlQue: Array<SqlStruct> = [];
@@ -45,7 +40,7 @@ class SQLLexter {
     }
   }
 
-  public getLexterResult() {
+  public getLexterResult(): Array<SqlStruct> {
     return this.sqlQue;
   }
 

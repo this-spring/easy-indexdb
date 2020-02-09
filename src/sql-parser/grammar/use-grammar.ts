@@ -3,20 +3,17 @@
  * @Company: kaochong
  * @Date: 2020-02-09 18:39:27
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-09 18:49:11
+ * @LastEditTime : 2020-02-09 19:24:00
  */
+import { SqlStruct, UseGrammarType } from '../base';
 
 class UseGrammar {
-  constructor() {
-      
-  }
-
-  public parserUseSql(lexter: Array<>) {
-
-  }
-
-  public getUseSqlGrammar() {
-
+  public static parserUseSql(lexter: SqlStruct): UseGrammarType {
+    const res: UseGrammarType = {
+      cmd: lexter.cmd,
+      operation: lexter.other.shift(),
+    };
+    return res;
   }
 }
 

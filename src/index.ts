@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-01-14 23:32:29
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-09 12:55:12
+ * @LastEditTime : 2020-02-09 23:56:00
  */
 // var Parser = require('sqlparser');
 // import Parser from 'sqlparser';
@@ -11,11 +11,16 @@
 // console.log(result);
 
 import SqlLexter from './sql-parser/sql-lexter';
+import UseGrammar from './sql-parser/grammar/use-grammar';
+import { CommandType, SqlStruct } from './sql-parser/base';
+
 class EasyIndexDb {
   private sqlLexter: SqlLexter = null;
+  private useGrammar: UseGrammar = null;
 
   constructor() {
     this.sqlLexter = new SqlLexter();
+    this.useGrammar = new UseGrammar();
   } 
 
   public initDB(sql: any) {
@@ -24,6 +29,15 @@ class EasyIndexDb {
 
   public execute(sql: any) {
     this.sqlLexter.parserSQL(sql);
+    const resSqlLexter:Array<SqlStruct> = this.sqlLexter.getLexterResult();
+    resSqlLexter.forEach(this.handleLexter.bind(this));
+  }
+
+  private handleLexter(value: SqlStruct, index: number, arr: Array<SqlStruct>) {
+    const sqlKey = value.cmd;
+    switch (sqlKey) {
+      case CommandType.
+    }
   }
 }
 
