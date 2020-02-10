@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-02-05 23:06:03
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 13:58:23
+ * @LastEditTime : 2020-02-10 15:14:23
  */
 export type DBMessage = {
   dbName: string,
@@ -44,4 +44,14 @@ export type TableType = {
 export type TableGrammarType = {
   cmd: CommandType,
   table: TableType,
+}
+
+// 语法解析后：insert产生结构
+export type InsertType = {
+  tableName: string,
+  column: Map<string, any>,
+}
+export type InsertGrammarType = {
+  cmd: CommandType,
+  insert: InsertType,
 }

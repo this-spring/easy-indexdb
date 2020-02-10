@@ -3,16 +3,17 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:08:41
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 14:59:38
+ * @LastEditTime : 2020-02-10 18:44:08
  */
-import { UseGrammarType, TableGrammarType, DBMessage } from "../sql-parser/base";
-import { inClude } from "../help/tool";
+import { UseGrammarType, TableGrammarType, DBMessage, InsertGrammarType } from "../sql-parser/base";
+import { inClude, map2Obj } from "../help/tool";
 
 class DBManager {
   private version: number = 0;
   private dbName: string = '';
   private request: IDBOpenDBRequest;
   private managerObj: Array<TableGrammarType> = [];
+  private db: IDBDatabase;
   private dbMessage: DBMessage = {
     dbName: '',
     oldVersion: 0,
@@ -37,14 +38,28 @@ class DBManager {
     this.managerObj.push(t);
   }
 
+  public executeInsert(i: InsertGrammarType): void {
+    const tableName = i.insert.tableName,
+          column = i.insert.column,
+          // transaction = this.db.transaction([tableName]),
+          objectStoreReq = this.db.transaction([tableName], 'readwrite').objectStore(tableName),
+          obj = map2Obj(column);
+    console.log('executeInsert:', obj);
+    objectStoreReq.add(obj);
+  }
+
   private requestError(): void {
     console.log('requestError');
   }
 
-  private requestSuccess(): void {
-    console.log('requestSuccess');
+  private requestSuccess(event: any): void {
+    this.db = event.target.result;
+    console.log('requestSuccess:', event);
   }
-
+  // 表
+  // 增: 在输入表结构中有，在原有表结构中没有 ✔️ done
+  // 删: 在输入表结构中没有，在原有表结构中有 ❌
+  // 改: 输入表和原有表都有，但是字段不同（这里涉及字段的增、删、改）❌
   private onupgradeneeded(event: any): void {
     console.log('requestUpgradeneeded, event:', event);
     const oldVersion = event.oldVersion,

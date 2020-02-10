@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:12:45
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 12:01:47
+ * @LastEditTime : 2020-02-10 15:53:11
  */
 import { CommandType, SqlStruct } from './base';
 
@@ -21,7 +21,7 @@ class SQLLexter {
       if (!template) continue;
       for (;index < tempateLen; index += 1) {
         const cur = template.charAt(index);
-        if (/^[a-z_]+$/i.test(cur)) {
+        if (/^[a-z_]+$/i.test(cur) || /^[0-9_]+$/i.test(cur)) {
           let sub = '', res = template.charAt(index);
           while(index < template.length) {
             index ++;
@@ -41,7 +41,10 @@ class SQLLexter {
   }
 
   public getLexterResult(): Array<SqlStruct> {
-    return this.sqlQue;
+    const que = this.sqlQue;
+    this.sqlQue = [];
+    this.tokenQue = [];
+    return que;
   }
 
   private tokenStart(type: any) {
