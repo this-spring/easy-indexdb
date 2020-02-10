@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-01-14 23:32:29
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-09 23:56:00
+ * @LastEditTime : 2020-02-10 11:49:42
  */
 // var Parser = require('sqlparser');
 // import Parser from 'sqlparser';
@@ -12,7 +12,8 @@
 
 import SqlLexter from './sql-parser/sql-lexter';
 import UseGrammar from './sql-parser/grammar/use-grammar';
-import { CommandType, SqlStruct } from './sql-parser/base';
+import { CommandType, SqlStruct, UseGrammarType, TableGrammarType } from './sql-parser/base';
+import TableGrammar from './sql-parser/grammar/table-grammar';
 
 class EasyIndexDb {
   private sqlLexter: SqlLexter = null;
@@ -20,7 +21,7 @@ class EasyIndexDb {
 
   constructor() {
     this.sqlLexter = new SqlLexter();
-    this.useGrammar = new UseGrammar();
+    // this.useGrammar = new UseGrammar();
   } 
 
   public initDB(sql: any) {
@@ -30,14 +31,22 @@ class EasyIndexDb {
   public execute(sql: any) {
     this.sqlLexter.parserSQL(sql);
     const resSqlLexter:Array<SqlStruct> = this.sqlLexter.getLexterResult();
+    console.log('after lexter:', resSqlLexter);
     resSqlLexter.forEach(this.handleLexter.bind(this));
   }
 
   private handleLexter(value: SqlStruct, index: number, arr: Array<SqlStruct>) {
     const sqlKey = value.cmd;
+    let res: UseGrammarType | TableGrammarType = null;
     switch (sqlKey) {
-      case CommandType.
+      case CommandType.Use:
+        res = UseGrammar.parserUseSql(value);
+        break;
+      case CommandType.Create:
+        res = TableGrammar.parserTableSql(value);
+        break;
     }
+    console.log('handleLexter: ', res);
   }
 }
 
