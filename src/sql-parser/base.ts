@@ -3,16 +3,14 @@
  * @Company: kaochong
  * @Date: 2020-02-05 23:06:03
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 11:38:53
+ * @LastEditTime : 2020-02-10 13:58:23
  */
-// export type CommandType = {
-//   Use: 'Use',
-//   Create: 'Create',
-//   Select: 'Select',
-//   Update: 'Update',
-//   Insert: 'Insert',
-//   Delete: 'Delete',
-// };
+export type DBMessage = {
+  dbName: string,
+  oldVersion: number,
+  newVersion: number,
+  objectStoreNames: Array<any>,
+};
 
 export enum CommandType {
     Use = 'use',
@@ -29,9 +27,13 @@ export type SqlStruct = {
 }
 
 // 语法解析后：use产生结构
+export type UseType = {
+  dbName: string,
+  version: number,
+}
 export type UseGrammarType = {
   cmd: CommandType,
-  operation: string,
+  use: UseType,
 }
 
 // 语法解析后：table产生结构

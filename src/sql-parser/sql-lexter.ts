@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:12:45
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-09 19:28:54
+ * @LastEditTime : 2020-02-10 12:01:47
  */
 import { CommandType, SqlStruct } from './base';
 
