@@ -3,7 +3,7 @@
  * @Company: kaochong
  * @Date: 2020-02-05 23:06:03
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 15:14:23
+ * @LastEditTime : 2020-02-11 15:10:25
  */
 export type DBMessage = {
   dbName: string,
@@ -19,7 +19,12 @@ export enum CommandType {
     Update = 'update',
     Insert = 'insert',
     Delete = 'delete',
-  };
+};
+
+export enum StateCode {
+  Success = '2000',
+  Error = '20001',
+}
 
 export type SqlStruct = {
   cmd: CommandType,
@@ -54,4 +59,19 @@ export type InsertType = {
 export type InsertGrammarType = {
   cmd: CommandType,
   insert: InsertType,
+}
+
+// 语法解析后：select产生结构
+export type SelectType = {
+  tableName: string,
+  where: Map<string, any>
+}
+export type SelectGrammarType = {
+  cmd: CommandType,
+  select: SelectType,
+}
+
+export type ResTemplate = {
+  code: StateCode,
+  data: any
 }

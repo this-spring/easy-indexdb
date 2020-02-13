@@ -3,16 +3,15 @@
  * @Company: kaochong
  * @Date: 2020-02-03 15:12:45
  * @LastEditors  : xiuquanxu
- * @LastEditTime : 2020-02-10 15:53:11
+ * @LastEditTime : 2020-02-13 16:23:12
  */
 import { CommandType, SqlStruct } from './base';
 
 class SQLLexter {
-  private sqlQue: Array<SqlStruct> = [];
-  private tokenQue: Array<any> = [];
 
   public parserSQL(sql: string) {
     const afterTrimSql = sql.toString().trim().toLowerCase();
+    let sqlQue: Array<SqlStruct> = [], tokenQue: Array<any> = [];
     const afterQuoSpace = this.handleSingleQuoSpace(afterTrimSql);
     for (let i = 0, len = afterQuoSpace.length; i < len; i += 1) {
       const template = afterQuoSpace[i];
@@ -21,7 +20,17 @@ class SQLLexter {
       if (!template) continue;
       for (;index < tempateLen; index += 1) {
         const cur = template.charAt(index);
-        if (/^[a-z_]+$/i.test(cur) || /^[0-9_]+$/i.test(cur)) {
+        if("'" === cur || '"' === cur) {
+          let sub = '';
+          let start = index + 1, end = index;
+          index ++;
+          while(index < template.length && cur !== (sub = template.charAt(index))) {
+            index ++;
+          }
+          end = index;
+          const res = template.substring(start, end);
+          tokenQue.push(res);
+        } else if (/^[a-z_]+$/i.test(cur) || /^[0-9_]+$/i.test(cur) || /^\*/i.test(cur)) {
           let sub = '', res = template.charAt(index);
           while(index < template.length) {
             index ++;
@@ -32,19 +41,19 @@ class SQLLexter {
             }
             res += sub
           }
-          console.log(res);
-          this.tokenQue.push(res);
+          tokenQue.push(res);
         }
       }
-      this.handleAllEnd();
+      const cmd = tokenQue.shift();
+      const sqlStru: SqlStruct = {
+        cmd: cmd,
+        other: JSON.parse(JSON.stringify(tokenQue)),
+      };
+      tokenQue = [];
+      sqlQue.push(sqlStru);
     }
-  }
-
-  public getLexterResult(): Array<SqlStruct> {
-    const que = this.sqlQue;
-    this.sqlQue = [];
-    this.tokenQue = [];
-    return que;
+    const res = JSON.parse(JSON.stringify(sqlQue));
+    return res;
   }
 
   private tokenStart(type: any) {
@@ -56,13 +65,7 @@ class SQLLexter {
   }
 
   private handleAllEnd() {
-    const cmd = this.tokenQue.shift();
-    const sqlStru: SqlStruct = {
-      cmd: cmd,
-      other: this.tokenQue,
-    };
-    this.tokenQue = [];
-    this.sqlQue.push(sqlStru);
+
   }
 
   private handleSingleQuoSpace(str: string) {
